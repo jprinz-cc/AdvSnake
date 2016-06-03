@@ -26,7 +26,8 @@ public class MainActivity extends Activity {
 
     //The snake head sprite sheet
     Bitmap headAnimBitmap;
-
+    Bitmap bodyBitmap;
+    Bitmap tailBitmap;
     //The portion of the bitmap to be drawn in the current frame
     Rect rectToBeDrawn;
 
@@ -52,15 +53,18 @@ public class MainActivity extends Activity {
         //setContentView(R.layout.activity_main);
 
         //find out the width and height of the screen
-        Display display =
-                getWindowManager().getDefaultDisplay();
+        Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         screenWidth = size.x;
         screenHeight = size.y;
-        headAnimBitmap =
-                BitmapFactory.decodeResource(getResources(),
-                        R.drawable.head_sprite_sheet);
+
+        headAnimBitmap =  BitmapFactory.decodeResource(getResources(), R.drawable.head_sprite_sheet);
+        bodyBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.body);
+        bodyBitmap= Bitmap.createScaledBitmap(bodyBitmap, 200, 200, false);
+        tailBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tail);
+        tailBitmap= Bitmap.createScaledBitmap(tailBitmap, 200, 200, false);
+
         snakeAnimView = new SnakeAnimView(this);
 
         setContentView(snakeAnimView);
@@ -107,21 +111,20 @@ public class MainActivity extends Activity {
             if (ourHolder.getSurface().isValid()) {
                 canvas = ourHolder.lockCanvas();
                 Paint paint = new Paint();
-                canvas.drawColor(Color.BLACK);//the background
+                canvas.drawColor(Color.BLACK);  //The background
                 paint.setColor(Color.argb(255, 255, 255, 255));
                 paint.setTextSize(150);
-                canvas.drawText("Snake", 10, 150, paint);
-                paint.setTextSize(25);
-                canvas.drawText(" Hi Score:" + hi, 10,
-                        screenHeight-50, paint);
+                canvas.drawText("Snake 2.0", 10, 150, paint);
+                paint.setTextSize(45);
+                canvas.drawText(" Hi Score:" + hi, 40, screenHeight - 50, paint);
                 //Draw the snake head
                 //make this Rect whatever size and location you like
                 //(startX, startY, endX, endY)
-                Rect destRect = new Rect(screenWidth/2-100,
-                        screenHeight/2-100, screenWidth/2+100,
-                        screenHeight/2+100);
-                canvas.drawBitmap(headAnimBitmap,
-                        rectToBeDrawn, destRect, paint);
+                Rect destRect = new Rect(screenWidth/2+100, screenHeight/2-100, screenWidth/2+300, screenHeight/2+100);
+                canvas.drawBitmap(headAnimBitmap, rectToBeDrawn, destRect, paint);
+                canvas.drawBitmap(bodyBitmap,screenWidth/2-100,screenHeight/2-100, paint);
+                canvas.drawBitmap(tailBitmap,screenWidth/2-300,screenHeight/2-100, paint);
+
                 ourHolder.unlockCanvasAndPost(canvas);
             }
         }
@@ -137,6 +140,7 @@ public class MainActivity extends Activity {
                 try {
                     ourThread.sleep(timeToSleep);
                 } catch (InterruptedException e) {
+                    //Catch here
                 }
             }
             lastFrameTime = System.currentTimeMillis();
@@ -159,6 +163,7 @@ public class MainActivity extends Activity {
         public boolean onTouchEvent(MotionEvent
                                             motionEvent) {
             startActivity(i);
+            finish();
             return true;
         }
 
@@ -173,6 +178,7 @@ public class MainActivity extends Activity {
         }
         finish();
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -184,6 +190,7 @@ public class MainActivity extends Activity {
         super.onPause();
         snakeAnimView.pause();
     }
+
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             snakeAnimView.pause();
